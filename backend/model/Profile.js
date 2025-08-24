@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// Profile Schema
+// Profile Schema (*)
 const profileSchema = new Schema({
     mobileNo: {
         type: Number,

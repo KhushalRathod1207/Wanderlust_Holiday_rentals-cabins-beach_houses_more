@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Review = require("./review");
 
-// Listing Schema
+// Listing Schema (*)
 const listingSchema = new Schema({
     title: {
         type: String,

@@ -6,7 +6,7 @@ module.exports.signup_Page_Render = (req, res) => {
     res.status(200).json({ message: "Send POST request with username, email, password to signup" });
 };
 
-// Signup user
+// Signup user (*)
 module.exports.user_Signup_On_Website = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
@@ -29,12 +29,12 @@ module.exports.user_Signup_On_Website = async (req, res, next) => {
     }
 };
 
-// Login Page - JSON placeholder
+// Login Page - JSON placeholder (*)
 module.exports.login_Page_Render = (req, res) => {
     res.status(200).json({ message: "Send POST request with username & password to login" });
 };
 
-// Login user
+// Login user(*)
 module.exports.login_User = (req, res) => {
     const redirectUrl = res.locals.redirectUrl || '/listings';
     res.status(200).json({
@@ -45,7 +45,7 @@ module.exports.login_User = (req, res) => {
     });
 };
 
-// Logout user
+// Logout user (*)
 module.exports.logout_User = (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err);
@@ -56,7 +56,7 @@ module.exports.logout_User = (req, res, next) => {
     });
 };
 
-// Current logged-in user
+// Current logged-in user (*)
 module.exports.current_User = (req, res) => {
     if (req.isAuthenticated()) {
         res.json({ success: true, user: req.user });

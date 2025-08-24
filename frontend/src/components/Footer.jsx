@@ -3,10 +3,10 @@ import '../index.css';
 
 const Footer = () => {
     return (
-        <>
+        < >
             <hr className="my-0" />
-            <footer className="bg-white" role="contentinfo">
-                <div className="container py-4">
+            <footer className="bg-white" role="contentinfo" >
+                <div className="container py-4" >
                     <div className="row g-4">
                         {/* Support */}
                         <div className="col-md-4 mb-4 con">

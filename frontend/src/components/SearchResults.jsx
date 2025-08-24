@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { searchListings } from "../api";
+import '../index.css';
+
+
 
 const SearchResults = () => {
     const location = useLocation();
@@ -21,7 +24,7 @@ const SearchResults = () => {
             try {
                 setLoading(true);
                 const listings = await searchListings(searchQuery);
-                setResults(listings); // <-- this must match backend
+                setResults(listings);
             } catch (err) {
                 console.error("Search error:", err);
                 setResults([]);
@@ -34,62 +37,55 @@ const SearchResults = () => {
     }, [searchQuery]);
 
     return (
-        <div className="container my-5">
-            <h2 className="mb-4">
-                Search Results for <span className="text-danger">"{searchQuery}"</span>
-            </h2>
-
+        <div className="container my-5" style={{ marginTop: "100px" }}>
             {loading ? (
-                <p className="text-muted">Loading...</p>
+                <p className="text-muted text-center">Loading...</p>
             ) : results.length === 0 ? (
-                <div className="alert alert-warning">
+                <h3 className="text-center my-5 text-danger">
                     No listings found for "{searchQuery}"
-                </div>
+                </h3>
             ) : (
-                <div className="row g-4">
-                    {results.map((listing) => (
-                        <div className="col-sm-12 col-md-6 col-lg-4" key={listing._id}>
-                            <div className="card shadow-sm h-100 border-0 search-card">
-                                <img
-                                    src={listing.image?.url || "https://via.placeholder.com/300x220"}
-                                    alt={listing.title}
-                                    className="card-img-top"
-                                    style={{ height: "220px", objectFit: "cover", borderRadius: "8px 8px 0 0" }}
-                                />
-                                <div className="card-body d-flex flex-column">
-                                    <h5 className="card-title mb-1">{listing.title}</h5>
-                                    <p className="card-text text-muted mb-2">📍 {listing.location}</p>
-                                    <p className="fw-bold text-danger mb-3">₹{listing.price.toLocaleString("en-IN")}</p>
-                                    <Link
-                                        to={`/listings/${listing._id}`}
-                                        className="btn btn-danger mt-auto"
-                                    >
-                                        View Details
-                                    </Link>
+                <>
+                    <h3 className="text-center my-3">
+                        Search Results for "<span className="text-danger">{searchQuery}</span>"
+                    </h3>
+                    <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                        {results.map((listing) => (
+                            <Link
+                                to={`/listings/${listing._id}`}
+                                key={listing._id}
+                                className="link-list text-decoration-none text-dark"
+                            >
+                                <div className="col">
+                                    <div className="card h-100 shadow-sm search-card">
+                                        <img
+                                            src={listing.image?.url || "https://via.placeholder.com/300x220"}
+                                            className="card-img-top"
+                                            alt={listing.title}
+                                            style={{ height: "20rem", objectFit: "cover", borderRadius: "8px 8px 0 0" }}
+                                        />
+                                        <div className="card-body d-flex flex-column">
+                                            <p className="card-text flex-grow-1 mb-2">
+                                                <b>{listing.title}</b>
+                                                <br />
+                                                <span className="text-muted">{listing.description}</span>
+                                            </p>
+                                            <div className="fw-bold mb-2">
+                                                ₹{listing.price.toLocaleString("en-IN")}/ night
+                                                <i className="tex_info" style={{ display: "none" }}>
+                                                    &nbsp;+18% GST
+                                                </i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </>
             )}
 
-            <style>{`
-                .search-card {
-                    border-radius: 10px;
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
-                }
-                .search-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-                }
-                .btn-danger {
-                    border-radius: 50px;
-                    transition: background-color 0.2s ease;
-                }
-                .btn-danger:hover {
-                    background-color: #b71c1c;
-                }
-            `}</style>
+
         </div>
     );
 };

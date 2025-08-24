@@ -1,6 +1,6 @@
 const Listing = require("../model/listing");
 
-// Search listings by title
+// Search listings by title (*)
 module.exports.searchListings = async (req, res, next) => {
     try {
         const query = req.query.query || "";

@@ -1,5 +1,6 @@
 const Listing = require("../model/listing.js");
 
+// Display Category wise listings (*)
 module.exports.categories_display = async (req, res, next) => {
     try {
         const { category } = req.params;

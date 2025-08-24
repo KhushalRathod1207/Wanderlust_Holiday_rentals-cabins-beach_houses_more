@@ -26,20 +26,34 @@ export const createListing = async (formData) => {
 
 // Update listing WITHOUT image
 // Update listing WITHOUT image
-export const updateListing = async (id, listingData) => {
-    const res = await axios.put(
-        `${API_BASE}/listings/${id}`,
-        { listing: listingData }, // 🔑 must wrap in `listing`
-        { withCredentials: true }
-    );
-    return res.data.success ? res.data.listing : null;
+
+export const updateListing = async (id, formData) => {
+    try {
+        const response = await axios.put(
+            `http://localhost:3008/listings/${id}`,
+            formData,
+            { withCredentials: true } // important if using session
+        );
+        return response.data.listing;
+    } catch (err) {
+        console.error(err.response?.data || err);
+        throw err;
+    }
 };
+
 
 
 // Delete listing
 export const deleteListing = async (id) => {
     const res = await axios.delete(`${API_BASE}/listings/${id}`, { withCredentials: true });
     return res.data; // { success: true, message: "Listing deleted" }
+};
+
+
+// Delete profile
+export const deleteProfile = async (userId) => {
+    const res = await axios.delete(`${API_BASE}/profile/${userId}`, { withCredentials: true });
+    return res.data; // { success: true, message: "User, listings, and reviews deleted successfully!" }
 };
 
 

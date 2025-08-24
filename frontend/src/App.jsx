@@ -40,48 +40,53 @@ function App() {
 
   return (
     <Router>
-      <Navbar currUser={currUser} setCurrUser={setCurrUser} />
-      <Routes>
-        <Route path="/" element={<ListingIndex />} />
-        <Route path="/listings" element={<ListingIndex />} />
-        <Route path="/listings/:id" element={<ShowListing currUser={currUser} />} />
-        <Route path="/login" element={<Login setCurrUser={setCurrUser} />} />
-        <Route path="/signup" element={<Signup setCurrUser={setCurrUser} />} />
-        <Route path="/categories/:category" element={<Category />} />
-        <Route path="/search" element={<SearchResults />} />
+      <div className="app-container"> {/* <-- new flex wrapper */}
+        <Navbar currUser={currUser} setCurrUser={setCurrUser} />
+        <div className="main-content"> {/* <-- grows to push footer */}
+          <Routes>
+            <Route path="/" element={<ListingIndex />} />
+            <Route path="/listings" element={<ListingIndex />} />
+            <Route path="/listings/:id" element={<ShowListing currUser={currUser} />} />
+            <Route path="/login" element={<Login setCurrUser={setCurrUser} />} />
+            <Route path="/signup" element={<Signup setCurrUser={setCurrUser} />} />
+            <Route path="/categories/:category" element={<Category />} />
+            <Route path="/search" element={<SearchResults />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/listings/new"
-          element={
-            <ProtectedRoute currUser={currUser}>
-              <NewListing />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/listings/:id/edit"
-          element={
-            <ProtectedRoute currUser={currUser}>
-              <ListingEdit />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile/:id"
-          element={
-            <ProtectedRoute currUser={currUser}>
-              <ProfilePage currUser={currUser} />
-            </ProtectedRoute>
-          }
-        />
+            {/* Protected Routes */}
+            <Route
+              path="/listings/new"
+              element={
+                <ProtectedRoute currUser={currUser}>
+                  <NewListing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/listings/:id/edit"
+              element={
+                <ProtectedRoute currUser={currUser}>
+                  <ListingEdit />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile/:id"
+              element={
+                <ProtectedRoute currUser={currUser}>
+                  <ProfilePage currUser={currUser} />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Catch-all */}
-        <Route path="*" element={<Error message="Page Not Found" />} />
-      </Routes>
-      <Footer />
+            {/* Catch-all */}
+            <Route path="*" element={<Error message="Page Not Found" />} />
+          </Routes>
+        </div>
+        <Footer />
+      </div>
     </Router>
   );
 }
+
 
 export default App;

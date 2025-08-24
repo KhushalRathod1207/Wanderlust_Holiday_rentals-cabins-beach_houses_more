@@ -1,9 +1,12 @@
 const { Joi_listingSchema, Joi_reviewSchema } = require("../Schema.js");
 const Listing = require("../model/listing.js");
 const Review = require("../model/review.js");
+const User = require("../model/user.js");
 const ExpressError = require("./expressError.js");
 
+// ------------------------
 // Check if user is logged in
+// ------------------------
 module.exports.isLoggedin = (req, res, next) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ success: false, message: "You must be logged in" });
@@ -11,7 +14,9 @@ module.exports.isLoggedin = (req, res, next) => {
     next();
 };
 
+// ------------------------
 // Validate Listing
+// ------------------------
 module.exports.validateListing = (req, res, next) => {
     const { error } = Joi_listingSchema.validate(req.body);
     if (error) {
@@ -21,7 +26,9 @@ module.exports.validateListing = (req, res, next) => {
     next();
 };
 
+// ------------------------
 // Validate Review
+// ------------------------
 module.exports.validateReview = (req, res, next) => {
     const { error } = Joi_reviewSchema.validate(req.body);
     if (error) {
@@ -31,33 +38,46 @@ module.exports.validateReview = (req, res, next) => {
     next();
 };
 
+// ------------------------
 // Check Listing Owner
-module.exports.isOwner = async (req, res, next) => {
-    const { id } = req.params;
+// ------------------------
+module.exports.isListingOwner = async (req, res, next) => {
+    const { id } = req.params; // listing ID
     const listing = await Listing.findById(id);
-    if (!listing) {
-        return res.status(404).json({ success: false, message: "Listing not found" });
-    }
+    if (!listing) return res.status(404).json({ success: false, message: "Listing not found" });
     if (!listing.owner.equals(req.user._id)) {
         return res.status(403).json({ success: false, message: "You are not the owner of this listing" });
     }
     next();
 };
 
+// ------------------------
 // Check Review Author
+// ------------------------
 module.exports.isReviewAuthor = async (req, res, next) => {
     const { reviewId } = req.params;
     const review = await Review.findById(reviewId);
-    if (!review) {
-        return res.status(404).json({ success: false, message: "Review not found" });
-    }
+    if (!review) return res.status(404).json({ success: false, message: "Review not found" });
     if (!review.author.equals(req.user._id)) {
         return res.status(403).json({ success: false, message: "You are not the author of this review" });
     }
     next();
 };
 
-// Save Redirect URL (optional for React, mainly frontend handles)
+// ------------------------
+// Check Profile Owner
+// ------------------------
+module.exports.isProfileOwner = async (req, res, next) => {
+    const { id } = req.params; // user ID
+    if (!req.user._id.equals(id)) {
+        return res.status(403).json({ success: false, message: "You are not allowed to perform this action" });
+    }
+    next();
+};
+
+// ------------------------
+// Save Redirect URL (optional)
+// ------------------------
 module.exports.saveRedirectUrl = (req, res, next) => {
     if (req.session.redirectUrl) {
         res.locals.redirectUrl = req.session.redirectUrl;

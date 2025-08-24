@@ -3,7 +3,7 @@ import { createListing } from "../../api";
 import { useNavigate } from "react-router-dom";
 import '../../index.css';
 
-const CreateListing = () => {
+const NewListing = () => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -19,18 +19,21 @@ const CreateListing = () => {
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
 
+    // Handle form field changes
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-        if (files) {
+        if (files && files.length > 0) {
             setFormData({ ...formData, image: files[0] });
         } else {
             setFormData({ ...formData, [name]: value });
         }
     };
 
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Client-side validation
         const newErrors = {};
         if (!formData.title) newErrors.title = "Title is required.";
         if (!formData.description) newErrors.description = "Description is required.";
@@ -47,17 +50,28 @@ const CreateListing = () => {
         setSubmitting(true);
 
         try {
+            // Prepare FormData
             const data = new FormData();
-            for (let key in formData) {
-                data.append(`listing[${key}]`, formData[key]);
-            }
+            data.append("title", formData.title);
+            data.append("description", formData.description);
+            data.append("price", formData.price);
+            data.append("country", formData.country);
+            data.append("category", formData.category);
+            data.append("location", formData.location);
+            if (formData.image) data.append("image", formData.image);
 
-            await createListing(data);
-            alert("Listing created successfully!");
-            navigate("/listings");
+            // API call
+            const listing = await createListing(data);
+
+            if (listing) {
+                alert("Listing created successfully!");
+                navigate("/listings");
+            } else {
+                alert("Failed to create listing. Try again.");
+            }
         } catch (err) {
             console.error(err);
-            alert("Failed to create listing.");
+            alert("Error creating listing. Check console for details.");
         } finally {
             setSubmitting(false);
         }
@@ -200,4 +214,4 @@ const CreateListing = () => {
     );
 };
 
-export default CreateListing;
+export default NewListing;

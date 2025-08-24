@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchListingById, updateListing } from "../../api";
-import '../../index.css';
+import "../../index.css";
 
 const ListingEdit = () => {
   const { id } = useParams();
@@ -16,11 +16,14 @@ const ListingEdit = () => {
     location: "",
   });
 
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch listing data when component mounts
+  // Inside useEffect when fetching listing
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,6 +33,7 @@ const ListingEdit = () => {
           navigate("/listings");
           return;
         }
+
         setFormData({
           title: listing.title || "",
           description: listing.description || "",
@@ -38,6 +42,16 @@ const ListingEdit = () => {
           category: listing.category || "",
           location: listing.location || "",
         });
+
+        // Handle image preview (existing listing image)
+        if (listing.image?.url) {
+          setImagePreview(listing.image.url); // Cloud URL
+        } else if (listing.image) {
+          setImagePreview(`http://localhost:5000/uploads/${listing.image}`); // Local file
+        } else {
+          setImagePreview(null); // No image
+        }
+
       } catch (err) {
         console.error("Fetch error:", err.response?.data || err);
         alert("Failed to fetch listing");
@@ -48,19 +62,27 @@ const ListingEdit = () => {
     fetchData();
   }, [id, navigate]);
 
+
   if (loading) return <p className="text-center mt-5">Loading listing...</p>;
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: "" }); // clear error on change
   };
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Handle image selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
-    // Validation
+  // Form validation
+  const validateForm = () => {
     const newErrors = {};
     if (!formData.title) newErrors.title = "Title is required";
     if (!formData.description) newErrors.description = "Description is required";
@@ -68,16 +90,25 @@ const ListingEdit = () => {
     if (!formData.country) newErrors.country = "Country is required";
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.location) newErrors.location = "Location is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
     setSubmitting(true);
     try {
-      // Send flat formData directly
-      const updated = await updateListing(id, formData);
+      const updateData = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        updateData.append(key, value);
+      });
+
+      if (imageFile) updateData.append("image", imageFile);
+
+      const updated = await updateListing(id, updateData);
       if (updated) {
         alert("Listing updated successfully!");
         navigate(`/listings/${id}`);
@@ -94,11 +125,17 @@ const ListingEdit = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">Update Listing</h2>
-      <form onSubmit={handleSubmit} className="needs-validation" noValidate>
+      <h2 className="mb-4 text-center">Update Listing</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="needs-validation shadow-sm p-4 rounded"
+        noValidate
+        encType="multipart/form-data"
+        style={{ backgroundColor: "#fff" }}
+      >
         {/* Title */}
         <div className="mb-3">
-          <label className="form-label">Title:</label>
+          <label className="form-label fw-bold">Title</label>
           <input
             type="text"
             name="title"
@@ -111,7 +148,7 @@ const ListingEdit = () => {
 
         {/* Description */}
         <div className="mb-3">
-          <label className="form-label">Description:</label>
+          <label className="form-label fw-bold">Description</label>
           <textarea
             name="description"
             className={`form-control ${errors.description ? "is-invalid" : ""}`}
@@ -124,7 +161,7 @@ const ListingEdit = () => {
 
         {/* Price */}
         <div className="mb-3">
-          <label className="form-label">Price:</label>
+          <label className="form-label fw-bold">Price (₹)</label>
           <input
             type="number"
             name="price"
@@ -137,7 +174,7 @@ const ListingEdit = () => {
 
         {/* Country */}
         <div className="mb-3">
-          <label className="form-label">Country:</label>
+          <label className="form-label fw-bold">Country</label>
           <input
             type="text"
             name="country"
@@ -150,7 +187,7 @@ const ListingEdit = () => {
 
         {/* Category */}
         <div className="mb-3">
-          <label className="form-label">Category:</label>
+          <label className="form-label fw-bold">Category</label>
           <select
             name="category"
             className={`form-select ${errors.category ? "is-invalid" : ""}`}
@@ -179,7 +216,7 @@ const ListingEdit = () => {
 
         {/* Location */}
         <div className="mb-3">
-          <label className="form-label">Location:</label>
+          <label className="form-label fw-bold">Location</label>
           <input
             type="text"
             name="location"
@@ -190,8 +227,38 @@ const ListingEdit = () => {
           <div className="invalid-feedback">{errors.location}</div>
         </div>
 
+        {/* Image Preview */}
+        {imagePreview && (
+          <div className="mb-3 text-center">
+            <label className="form-label fw-bold">Image Preview</label>
+            <br />
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="rounded shadow-sm"
+              style={{ maxWidth: "300px", maxHeight: "200px", objectFit: "cover" }}
+            />
+          </div>
+        )}
+
+        {/* Upload Image */}
+        <div className="mb-4">
+          <label className="form-label fw-bold">Upload Image</label>
+          <input
+            type="file"
+            name="image"
+            className="form-control"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+        </div>
+
         {/* Submit Button */}
-        <button type="submit" className="btn btn-dark" disabled={submitting}>
+        <button
+          type="submit"
+          className="btn btn-dark w-100"
+          disabled={submitting}
+        >
           {submitting ? "Updating..." : "Update Listing"}
         </button>
       </form>

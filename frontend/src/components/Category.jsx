@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { fetchListings, fetchListingsByCategory } from "../api"; // adjust path
+import { fetchListings, fetchListingsByCategory } from "../api";
 import { Link } from "react-router-dom";
-import "../index.css"; // your custom styles here
+import "../index.css";
 
+// Add "All Listings" as the first category
 const categories = [
+    { name: "All Listings", icon: "fa-list" },
     { name: "Trending", icon: "fa-fire" },
     { name: "Domes", icon: "fa-igloo" },
     { name: "Bed & Breakfast", icon: "fa-mug-saucer" },
@@ -23,29 +25,19 @@ const Category = ({ category }) => {
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showTaxes, setShowTaxes] = useState(false);
-
-    useEffect(() => {
-        const loadListings = async () => {
-            setLoading(true);
-            try {
-                const data = category
-                    ? await fetchListingsByCategory(category)
-                    : await fetchListings();
-                setListings(data);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadListings();
-    }, [category]);
+    const [activeCategory, setActiveCategory] = useState(category || "All Listings");
 
     const handleCategoryClick = async (categoryName) => {
+        setActiveCategory(categoryName);
         setLoading(true);
         try {
-            const data = await fetchListingsByCategory(categoryName);
-            setListings(data);
+            if (categoryName === "All Listings") {
+                const data = await fetchListings();
+                setListings(data);
+            } else {
+                const data = await fetchListingsByCategory(categoryName);
+                setListings(data);
+            }
         } catch (err) {
             console.error(err);
         } finally {
@@ -53,25 +45,34 @@ const Category = ({ category }) => {
         }
     };
 
-    return (
-        <div className="container mt-5">
-            <h3 className="text-center my-3">Listing for "{category || 'All'}"</h3>
+    useEffect(() => {
+        if (category) {
+            handleCategoryClick(category);
+        } else {
+            handleCategoryClick("All Listings");
+        }
+    }, [category]);
 
-            {/* Filters */}
-            <div className="filters-wrapper mb-4 d-flex flex-wrap gap-3">
+    return (
+        <div className="container mt-5" style={{ marginTop: "100px" }}>
+            <h3 className="text-center my-3">Listing for "{activeCategory}"</h3>
+
+            {/* Category Buttons */}
+            <div className="filters-wrapper mb-4 d-flex flex-wrap gap-3" style={{ overflowX: "auto" }}>
                 {categories.map((cat) => (
                     <button
                         key={cat.name}
-                        className="btn btn-light d-flex flex-column align-items-center"
+                        className={`btn btn-light d-flex flex-column align-items-center ${activeCategory === cat.name ? "border border-danger" : ""
+                            }`}
                         onClick={() => handleCategoryClick(cat.name)}
                     >
-                        <i className={`fa-solid ${cat.icon} fa-2x`}></i>
+                        <i className={`fa-solid ${cat.icon} fa-2x`} style={{ color: "rgb(106, 106, 106)" }}></i>
                         <p className="mb-0">{cat.name}</p>
                     </button>
                 ))}
             </div>
 
-            {/* Tax Toggle */}
+            {/* GST Toggle */}
             <div className="tax-toggle mb-4">
                 <div className="form-check form-switch">
                     <input
@@ -82,12 +83,12 @@ const Category = ({ category }) => {
                         onChange={() => setShowTaxes(!showTaxes)}
                     />
                     <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
-                        Display taxes
+                        Display GST
                     </label>
                 </div>
             </div>
 
-            {/* Skeleton Loader */}
+            {/* Listings / Skeleton */}
             {loading ? (
                 <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
                     {[...Array(6)].map((_, i) => (
@@ -107,10 +108,7 @@ const Category = ({ category }) => {
                 <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
                     {listings.map((listing) => (
                         <div key={listing._id} className="col">
-                            <Link
-                                to={`/listings/${listing._id}`}
-                                className="link-list text-decoration-none text-dark"
-                            >
+                            <Link to={`/listings/${listing._id}`} className="link-list text-decoration-none text-dark">
                                 <div className="card listing-card h-100">
                                     <img
                                         src={listing.image?.url || "/images/default.jpg"}
@@ -126,7 +124,9 @@ const Category = ({ category }) => {
                                         </p>
                                         <div style={{ color: "#212529" }}>
                                             ₹{listing.price.toLocaleString("en-IN")}/ night
-                                            {showTaxes && <i>&nbsp; +18% GST</i>}
+                                            <i className="tex_info" style={{ display: showTaxes ? "inline" : "none" }}>
+                                                &nbsp;+18% GST
+                                            </i>
                                         </div>
                                     </div>
                                 </div>
@@ -135,38 +135,8 @@ const Category = ({ category }) => {
                     ))}
                 </div>
             ) : (
-                <h3 className="text-center my-5 text-danger">
-                    Listings are not available for "{category}"
-                </h3>
+                <h3 className="text-center my-5 text-danger">Listings are not available</h3>
             )}
-
-            {/* Skeleton CSS */}
-            <style>{`
-                .skeleton-image {
-                    height: 200px;
-                    background: linear-gradient(-90deg, #eeeeee 0%, #f5f5f5 50%, #eeeeee 100%);
-                    background-size: 400% 400%;
-                    animation: shimmer 1.2s ease-in-out infinite;
-                }
-                .skeleton-line {
-                    height: 15px;
-                    border-radius: 8px;
-                    background: linear-gradient(-90deg, #eeeeee 0%, #f5f5f5 50%, #eeeeee 100%);
-                    background-size: 400% 400%;
-                    animation: shimmer 1.2s ease-in-out infinite;
-                }
-                @keyframes shimmer {
-                    0% { background-position: 100% 0; }
-                    100% { background-position: -100% 0; }
-                }
-                .listing-card {
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
-                }
-                .listing-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-                }
-            `}</style>
         </div>
     );
 };

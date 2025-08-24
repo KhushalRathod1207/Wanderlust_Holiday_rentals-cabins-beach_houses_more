@@ -2,7 +2,7 @@
 const Listing = require("../model/listing.js");
 const Review = require("../model/review.js");
 
-// POST /listings/:id/reviews
+// POST /listings/:id/reviews (*)
 module.exports.create_review = async (req, res) => {
     try {
         const { id } = req.params; // Listing ID
@@ -23,7 +23,7 @@ module.exports.create_review = async (req, res) => {
     }
 };
 
-// DELETE /listings/:id/reviews/:reviewId
+// DELETE /listings/:id/reviews/:reviewId (*)
 module.exports.delete_Review = async (req, res) => {
     try {
         const { id, reviewId } = req.params; // Listing ID & Review ID

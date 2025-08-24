@@ -8,6 +8,11 @@ const { isLoggedin, validateReview, isReviewAuthor } = require("../utils/middlew
 router.post("/", isLoggedin, validateReview, WrapAsync(reviewsController.create_review));
 
 // DELETE a review
-router.delete("/:reviewId", isLoggedin, isReviewAuthor, WrapAsync(reviewsController.delete_Review));
+router.delete(
+    "/:reviewId",
+    isLoggedin,
+    WrapAsync(isReviewAuthor), // wrap async middleware
+    WrapAsync(reviewsController.delete_Review)
+);
 
 module.exports = router;

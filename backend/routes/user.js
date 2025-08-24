@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const WrapAsync = require("../utils/WrapAsync.js");
+const WrapAsync = require("../utils/WrapAsync");
 const passport = require("passport");
 const { saveRedirectUrl } = require("../utils/middleware.js");
 const usersControllers = require("../controllers/users.js");
@@ -20,9 +20,11 @@ router.route("/login")
     );
 
 // LOGOUT
-router.route("/logout").post(usersControllers.logout_User);
+router.route("/logout")
+    .post(usersControllers.logout_User);
 
 // CURRENT USER
-router.route("/current").get(usersControllers.current_User);
+router.route("/current")
+    .get(usersControllers.current_User);
 
 module.exports = router;
