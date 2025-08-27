@@ -80,7 +80,7 @@ const sessionOptions = {
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 };
-
+    
 app.use(session(sessionOptions));
 app.use(flash());
 
