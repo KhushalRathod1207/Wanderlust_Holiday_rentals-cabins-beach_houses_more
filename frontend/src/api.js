@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Backend base URL
-const API_BASE = "http://localhost:3008";
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3008";
 
 
 // ----------------- Listings -----------------

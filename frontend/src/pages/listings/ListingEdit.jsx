@@ -47,7 +47,7 @@ const ListingEdit = () => {
         if (listing.image?.url) {
           setImagePreview(listing.image.url); // Cloud URL
         } else if (listing.image) {
-          setImagePreview(`http://localhost:5000/uploads/${listing.image}`); // Local file
+          setImagePreview(`${API_BASE}/uploads/${listing.image}`); // Local file
         } else {
           setImagePreview(null); // No image
         }

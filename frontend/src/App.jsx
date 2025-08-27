@@ -14,6 +14,7 @@ import Signup from "./pages/users/Signup";
 import ProfilePage from "./pages/profile/ProfilePage";
 import Category from "./components/Category";
 import SearchResults from "./components/SearchResults";
+import ChatBot from "./components/ChatBot";
 import Error from "./components/Error";
 import { getCurrentUser } from "./api";
 
@@ -83,6 +84,7 @@ function App() {
           </Routes>
         </div>
         <Footer />
+        <ChatBot />
       </div>
     </Router>
   );
