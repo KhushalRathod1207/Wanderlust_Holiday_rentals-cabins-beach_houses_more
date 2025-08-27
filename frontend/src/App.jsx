@@ -37,7 +37,7 @@ function App() {
     fetchUser();
   }, []);
 
-  if (loadingUser) return <p className="text-center mt-5">Loading user...</p>;
+  if (loadingUser) return <p className="text-center mt-5">Loading...</p>;
 
   return (
     <Router>

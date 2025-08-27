@@ -25,7 +25,7 @@ const Login = ({ setCurrUser }) => {
         const newErrors = {};
 
         // Frontend validation
-        if (!formData.username.trim()) newErrors.username = "Username is required.";
+        if (!formData.username.trim()) newErrors.username = "Email is required.";
         if (!formData.password.trim()) newErrors.password = "Password is required.";
 
         setErrors(newErrors);
@@ -62,7 +62,7 @@ const Login = ({ setCurrUser }) => {
                     <form onSubmit={handleSubmit} noValidate>
                         {/* Username */}
                         <div className="mb-3">
-                            <label htmlFor="username" className="form-label">Username:</label>
+                            <label htmlFor="username" className="form-label">Email:</label>
                             <input
                                 type="text"
                                 name="username"

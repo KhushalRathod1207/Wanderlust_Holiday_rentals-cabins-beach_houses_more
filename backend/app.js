@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
+
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -13,7 +14,6 @@ const passport = require("passport");
 const passport_local_strategy = require("passport-local");
 const methodOverride = require("method-override");
 const cors = require("cors");
-
 const port = process.env.PORT || 3008;
 
 // Import routes
@@ -23,6 +23,7 @@ const profileRoute = require("./routes/Profile.js");
 const userRoute = require("./routes/user.js");
 const searchRoute = require("./routes/search.js");
 const categoryRoutes = require("./routes/categories.js");
+const chatbotRoutes = require("./routes/chatbot.js");
 
 // Models
 const User = require("./model/user.js");
@@ -83,6 +84,8 @@ const sessionOptions = {
 app.use(session(sessionOptions));
 app.use(flash());
 
+
+
 // Passport config
 app.use(passport.initialize());
 app.use(passport.session());
@@ -97,7 +100,7 @@ app.use((req, res, next) => {
     res.locals.currUser = req.user;
     next();
 });
-
+app.use("/api", chatbotRoutes);
 app.use("/listings", listingsRoute);
 app.use("/listings/:id/reviews", reviewsRoute);
 app.use("/profile", profileRoute);

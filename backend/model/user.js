@@ -19,6 +19,10 @@ const userSchema = new Schema({
 }, { timestamps: true });
 
 // Add username & password via passport-local-mongoose
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose, {
+    usernameField: "email",  // ✅ passport expects email
+});
+
+
 
 module.exports = mongoose.model("User", userSchema);
