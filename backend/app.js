@@ -80,7 +80,7 @@ const sessionOptions = {
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 };
-    
+
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -100,6 +100,7 @@ app.use((req, res, next) => {
     res.locals.currUser = req.user;
     next();
 });
+
 app.use("/api", chatbotRoutes);
 app.use("/listings", listingsRoute);
 app.use("/listings/:id/reviews", reviewsRoute);

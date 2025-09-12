@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { signupUser } from "../../api"; // make sure this path is correct
+import { useNavigate, Link } from "react-router-dom";   // ✅ Import Link
+import { signupUser } from "../../api";
 import '../../index.css';
 
 const Signup = ({ setCurrUser }) => {
@@ -13,7 +13,7 @@ const Signup = ({ setCurrUser }) => {
         agree: false,
     });
     const [errors, setErrors] = useState({});
-    const [serverError, setServerError] = useState(""); // backend errors
+    const [serverError, setServerError] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -39,14 +39,12 @@ const Signup = ({ setCurrUser }) => {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                // Call backend API
                 const user = await signupUser({
                     username: formData.username,
                     email: formData.email,
                     password: formData.password
                 });
 
-                // Set current user and redirect
                 setCurrUser(user);
                 setFormData({ username: "", email: "", password: "", agree: false });
                 navigate("/listings");
@@ -146,6 +144,14 @@ const Signup = ({ setCurrUser }) => {
                             Sign Up
                         </button>
                     </form>
+
+                    {/* ✅ Login link */}
+                    <p className="text-center mt-3">
+                        Already have an account?{" "}
+                        <Link to="/login" className="text-decoration-none fw-bold">
+                            Login
+                        </Link>
+                    </p>
                 </div>
             </div>
         </div>

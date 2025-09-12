@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Components / Pages
@@ -17,6 +17,61 @@ import SearchResults from "./components/SearchResults";
 import ChatBot from "./components/ChatBot";
 import Error from "./components/Error";
 import { getCurrentUser } from "./api";
+
+function Layout({ currUser, setCurrUser }) {
+  const location = useLocation();
+
+  // Hide navbar/footer on login & signup
+  const hideLayout = ["/login", "/signup"].includes(location.pathname);
+
+  return (
+    <div className="app-container">
+      {!hideLayout && <Navbar currUser={currUser} setCurrUser={setCurrUser} />}
+      <div className="main-content">
+        <Routes>
+          <Route path="/" element={<ListingIndex />} />
+          <Route path="/listings" element={<ListingIndex />} />
+          <Route path="/listings/:id" element={<ShowListing currUser={currUser} />} />
+          <Route path="/login" element={<Login setCurrUser={setCurrUser} />} />
+          <Route path="/signup" element={<Signup setCurrUser={setCurrUser} />} />
+          <Route path="/categories/:category" element={<Category />} />
+          <Route path="/search" element={<SearchResults />} />
+
+          {/* Protected Routes */}
+          <Route
+            path="/listings/new"
+            element={
+              <ProtectedRoute currUser={currUser}>
+                <NewListing />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/listings/:id/edit"
+            element={
+              <ProtectedRoute currUser={currUser}>
+                <ListingEdit />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:id"
+            element={
+              <ProtectedRoute currUser={currUser}>
+                <ProfilePage currUser={currUser} />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch-all */}
+          <Route path="*" element={<Error message="Page Not Found" />} />
+        </Routes>
+      </div>
+      {!hideLayout && <Footer />}
+      {!hideLayout && <ChatBot />}
+    </div>
+  );
+}
 
 function App() {
   const [currUser, setCurrUser] = useState(null);
@@ -41,54 +96,9 @@ function App() {
 
   return (
     <Router>
-      <div className="app-container"> {/* <-- new flex wrapper */}
-        <Navbar currUser={currUser} setCurrUser={setCurrUser} />
-        <div className="main-content"> {/* <-- grows to push footer */}
-          <Routes>
-            <Route path="/" element={<ListingIndex />} />
-            <Route path="/listings" element={<ListingIndex />} />
-            <Route path="/listings/:id" element={<ShowListing currUser={currUser} />} />
-            <Route path="/login" element={<Login setCurrUser={setCurrUser} />} />
-            <Route path="/signup" element={<Signup setCurrUser={setCurrUser} />} />
-            <Route path="/categories/:category" element={<Category />} />
-            <Route path="/search" element={<SearchResults />} />
-
-            {/* Protected Routes */}
-            <Route
-              path="/listings/new"
-              element={
-                <ProtectedRoute currUser={currUser}>
-                  <NewListing />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/listings/:id/edit"
-              element={
-                <ProtectedRoute currUser={currUser}>
-                  <ListingEdit />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile/:id"
-              element={
-                <ProtectedRoute currUser={currUser}>
-                  <ProfilePage currUser={currUser} />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Catch-all */}
-            <Route path="*" element={<Error message="Page Not Found" />} />
-          </Routes>
-        </div>
-        <Footer />
-        <ChatBot />
-      </div>
+      <Layout currUser={currUser} setCurrUser={setCurrUser} />
     </Router>
   );
 }
-
 
 export default App;

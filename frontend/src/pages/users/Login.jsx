@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";  // ✅ Import Link
 import { loginUser } from "../../api"; // make sure the path is correct
 import '../../index.css';
 
@@ -107,6 +107,14 @@ const Login = ({ setCurrUser }) => {
                             Login
                         </button>
                     </form>
+
+                    {/* ✅ Signup Link */}
+                    <p className="text-center mt-3">
+                        Don’t have an account?{" "}
+                        <Link to="/signup" className="text-decoration-none fw-bold">
+                            Sign up
+                        </Link>
+                    </p>
                 </div>
             </div>
         </div>
