@@ -14,7 +14,6 @@ import Signup from "./pages/users/Signup";
 import ProfilePage from "./pages/profile/ProfilePage";
 import Category from "./components/Category";
 import SearchResults from "./components/SearchResults";
-import ChatBot from "./components/ChatBot";
 import Error from "./components/Error";
 import BeatLoader from "./components/BeatLoader";
 import { getCurrentUser } from "./api";
@@ -69,7 +68,6 @@ function Layout({ currUser, setCurrUser }) {
         </Routes>
       </div>
       {!hideLayout && <Footer />}
-      {!hideLayout && <ChatBot />}
     </div>
   );
 }

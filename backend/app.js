@@ -23,7 +23,6 @@ const profileRoute = require("./routes/Profile.js");
 const userRoute = require("./routes/user.js");
 const searchRoute = require("./routes/search.js");
 const categoryRoutes = require("./routes/categories.js");
-const chatbotRoutes = require("./routes/chatbot.js");
 
 // Models
 const User = require("./model/user.js");
@@ -101,7 +100,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/api", chatbotRoutes);
 app.use("/listings", listingsRoute);
 app.use("/listings/:id/reviews", reviewsRoute);
 app.use("/profile", profileRoute);
