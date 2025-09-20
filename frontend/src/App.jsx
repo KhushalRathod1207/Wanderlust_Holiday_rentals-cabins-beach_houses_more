@@ -16,6 +16,7 @@ import Category from "./components/Category";
 import SearchResults from "./components/SearchResults";
 import ChatBot from "./components/ChatBot";
 import Error from "./components/Error";
+import BeatLoader from "./components/BeatLoader";
 import { getCurrentUser } from "./api";
 
 function Layout({ currUser, setCurrUser }) {
@@ -92,7 +93,8 @@ function App() {
     fetchUser();
   }, []);
 
-  if (loadingUser) return <p className="text-center mt-5">Loading...</p>;
+  // if (loadingUser) return <p className="text-center mt-5">Loading Please Wait...</p>;
+  if (loadingUser) return <BeatLoader loadingUser={loadingUser} />
 
   return (
     <Router>
