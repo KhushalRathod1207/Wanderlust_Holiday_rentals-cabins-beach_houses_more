@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Backend base URL
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3008";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 
 // ----------------- Listings -----------------
@@ -30,7 +30,7 @@ export const createListing = async (formData) => {
 export const updateListing = async (id, formData) => {
     try {
         const response = await axios.put(
-            `http://localhost:3008/listings/${id}`,
+            `${API_BASE}/listings/${id}`,
             formData,
             { withCredentials: true } // important if using session
         );
