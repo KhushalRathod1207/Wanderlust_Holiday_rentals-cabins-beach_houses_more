@@ -33,6 +33,7 @@ const WrapAsync = require("./utils/WrapAsync.js");
 
 // DB connection
 const dbUrl = process.env.ATLASDB_URL;
+if (!dbUrl) console.warn("Warning: ATLASDB_URL not set!");
 mongoose.connect(dbUrl)
     .then(() => console.log("Connected to Database"))
     .catch(err => console.log(err));
@@ -48,11 +49,13 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
-// CORS
+const allowedOrigins = process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(",") : ["*"];
+
 app.use(cors({
-    origin: "http://localhost:5173",  // React app origin
-    credentials: true                 // allows sending cookies / credentials
+    origin: allowedOrigins,
+    credentials: true
 }));
+
 
 // Session store
 const store = MongoStore.create({
