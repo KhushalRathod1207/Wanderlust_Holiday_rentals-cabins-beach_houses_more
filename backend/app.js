@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
+
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -47,21 +48,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
-// CORS setup for Vercel frontend
-const allowedOrigins = process.env.CLIENT_ORIGIN
-    ? process.env.CLIENT_ORIGIN.split(",")
-    : [];
-
+// CORS
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true); // allow non-browser tools
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = `CORS policy does not allow access from ${origin}`;
-            return callback(new Error(msg), false);
-        }
-        return callback(null, true);
-    },
-    credentials: true
+    origin: "http://localhost:5173",  // React app origin
+    credentials: true                 // allows sending cookies / credentials
 }));
 
 // Session store
@@ -71,12 +61,13 @@ const store = MongoStore.create({
     touchAfter: 24 * 3600
 });
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 store.on("error", function (e) {
     console.log("SESSION STORE ERROR", e);
 });
 
-// Session configuration for cross-domain login
-// Update session cookie config dynamically
 const sessionOptions = {
     store,
     secret: process.env.SECRET,
@@ -84,14 +75,15 @@ const sessionOptions = {
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 };
 
 app.use(session(sessionOptions));
 app.use(flash());
+
+
 
 // Passport config
 app.use(passport.initialize());
@@ -108,20 +100,18 @@ app.use((req, res, next) => {
     next();
 });
 
-// ------------------------
-// Root route to show server is running
-// ------------------------
-app.get("/", (req, res) => {
-    res.status(200).json({ success: true, message: "Server is running successfully!" });
-});
-
-// Routes
 app.use("/listings", listingsRoute);
 app.use("/listings/:id/reviews", reviewsRoute);
 app.use("/profile", profileRoute);
 app.use("/users", userRoute);
 app.use("/search", searchRoute);
 app.use("/categories", categoryRoutes);
+
+
+// // 404
+// app.all("*", (req, res, next) => {
+//     next(new ExpressError(404, "Page Not Found"));
+// });
 
 // Error handler
 app.use((err, req, res, next) => {
