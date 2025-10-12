@@ -89,8 +89,9 @@ const ShowListing = ({ currUser }) => {
 
     // Construct proper image URL
     const imageUrl = listing.image
-        ? listing.image.url || `http://localhost:5000/uploads/${listing.image}` // if backend sends filename
+        ? listing.image.url || `${import.meta.env.VITE_API_URL}/uploads/${listing.image}`
         : "https://via.placeholder.com/600x400?text=No+Image";
+
 
     return (
         <div className="container mt-5">
