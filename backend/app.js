@@ -107,6 +107,13 @@ app.use((req, res, next) => {
     next();
 });
 
+// ------------------------
+// Root route to show server is running
+// ------------------------
+app.get("/", (req, res) => {
+    res.status(200).json({ success: true, message: "Server is running successfully!" });
+});
+
 // Routes
 app.use("/listings", listingsRoute);
 app.use("/listings/:id/reviews", reviewsRoute);
