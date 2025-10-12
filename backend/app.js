@@ -49,10 +49,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
-const allowedOrigins = process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(",") : ["*"];
+const allowedOrigins = process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(",") : [];
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: allowedOrigins,   // must list frontend URL
     credentials: true
 }));
 
@@ -78,10 +78,12 @@ const sessionOptions = {
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        secure: true,        // required for HTTPS frontend
+        sameSite: "none",    // allow cross-domain cookies
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 };
+
 
 app.use(session(sessionOptions));
 app.use(flash());
