@@ -2,7 +2,6 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -33,7 +32,6 @@ const WrapAsync = require("./utils/WrapAsync.js");
 
 // DB connection
 const dbUrl = process.env.ATLASDB_URL;
-if (!dbUrl) console.warn("Warning: ATLASDB_URL not set!");
 mongoose.connect(dbUrl)
     .then(() => console.log("Connected to Database"))
     .catch(err => console.log(err));
@@ -49,23 +47,22 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
+// CORS setup for Vercel frontend
 const allowedOrigins = process.env.CLIENT_ORIGIN
     ? process.env.CLIENT_ORIGIN.split(",")
     : [];
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like Postman)
-        if (!origin) return callback(null, true);
+        if (!origin) return callback(null, true); // allow non-browser tools
         if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+            const msg = `CORS policy does not allow access from ${origin}`;
             return callback(new Error(msg), false);
         }
         return callback(null, true);
     },
-    credentials: true, // important for sending cookies
+    credentials: true
 }));
-
 
 // Session store
 const store = MongoStore.create({
@@ -74,13 +71,11 @@ const store = MongoStore.create({
     touchAfter: 24 * 3600
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 store.on("error", function (e) {
     console.log("SESSION STORE ERROR", e);
 });
 
+// Session configuration for cross-domain login
 const sessionOptions = {
     store,
     secret: process.env.SECRET,
@@ -88,17 +83,14 @@ const sessionOptions = {
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        secure: true,
-        sameSite: "none",
+        secure: true,       // required for HTTPS
+        sameSite: "none",   // allow frontend on different domain
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 };
 
-
 app.use(session(sessionOptions));
 app.use(flash());
-
-
 
 // Passport config
 app.use(passport.initialize());
@@ -115,18 +107,13 @@ app.use((req, res, next) => {
     next();
 });
 
+// Routes
 app.use("/listings", listingsRoute);
 app.use("/listings/:id/reviews", reviewsRoute);
 app.use("/profile", profileRoute);
 app.use("/users", userRoute);
 app.use("/search", searchRoute);
 app.use("/categories", categoryRoutes);
-
-
-// // 404
-// app.all("*", (req, res, next) => {
-//     next(new ExpressError(404, "Page Not Found"));
-// });
 
 // Error handler
 app.use((err, req, res, next) => {
