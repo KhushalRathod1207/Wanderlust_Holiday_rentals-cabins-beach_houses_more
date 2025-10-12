@@ -78,8 +78,8 @@ const sessionOptions = {
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        secure: true,        // required for HTTPS frontend
-        sameSite: "none",    // allow cross-domain cookies
+        secure: true,
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 };
