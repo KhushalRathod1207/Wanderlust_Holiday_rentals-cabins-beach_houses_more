@@ -3,96 +3,151 @@ import axios from "axios";
 // Backend base URL
 const API_BASE = import.meta.env.VITE_API_BASE;
 
-
 // ----------------- Listings -----------------
 
 // Get all listings
 export const fetchListings = async () => {
-    const res = await axios.get(`${API_BASE}/listings`, { withCredentials: true });
-    return res.data.listings || [];
-};
-
-// Get a single listing by ID
-export const fetchListingById = async (id) => {
-    const res = await axios.get(`${API_BASE}/listings/${id}`, { withCredentials: true });
-    return res.data.success ? res.data.listing : null;
-};
-
-// Create new listing (still uses FormData if you want image in the future)
-export const createListing = async (formData) => {
-    const res = await axios.post(`${API_BASE}/listings`, formData, { withCredentials: true });
-    return res.data.success ? res.data.listing : null;
-};
-
-// Update listing WITHOUT image
-// Update listing WITHOUT image
-
-export const updateListing = async (id, formData) => {
     try {
-        const response = await axios.put(
-            `${API_BASE}/listings/${id}`,
-            formData,
-            { withCredentials: true } // important if using session
-        );
-        return response.data.listing;
+        const res = await axios.get(`${API_BASE}/listings`, { withCredentials: true });
+        return res.data.listings || [];
     } catch (err) {
-        console.error(err.response?.data || err);
+        console.error("Fetch Listings Error:", err.response?.data || err);
         throw err;
     }
 };
 
+// Get a single listing by ID
+export const fetchListingById = async (id) => {
+    try {
+        const res = await axios.get(`${API_BASE}/listings/${id}`, { withCredentials: true });
+        return res.data.success ? res.data.listing : null;
+    } catch (err) {
+        console.error("Fetch Listing By ID Error:", err.response?.data || err);
+        throw err;
+    }
+};
 
+// Create new listing
+export const createListing = async (formData) => {
+    try {
+        const res = await axios.post(`${API_BASE}/listings`, formData, { withCredentials: true });
+        return res.data.success ? res.data.listing : null;
+    } catch (err) {
+        console.error("Create Listing Error:", err.response?.data || err);
+        throw err;
+    }
+};
+
+// Update listing
+export const updateListing = async (id, formData) => {
+    try {
+        const res = await axios.put(`${API_BASE}/listings/${id}`, formData, { withCredentials: true });
+        return res.data.listing;
+    } catch (err) {
+        console.error("Update Listing Error:", err.response?.data || err);
+        throw err;
+    }
+};
 
 // Delete listing
 export const deleteListing = async (id) => {
-    const res = await axios.delete(`${API_BASE}/listings/${id}`, { withCredentials: true });
-    return res.data; // { success: true, message: "Listing deleted" }
+    try {
+        const res = await axios.delete(`${API_BASE}/listings/${id}`, { withCredentials: true });
+        return res.data;
+    } catch (err) {
+        console.error("Delete Listing Error:", err.response?.data || err);
+        throw err;
+    }
 };
-
-
-// Delete profile
-export const deleteProfile = async (userId) => {
-    const res = await axios.delete(`${API_BASE}/profile/${userId}`, { withCredentials: true });
-    return res.data; // { success: true, message: "User, listings, and reviews deleted successfully!" }
-};
-
 
 // ----------------- Reviews -----------------
 export const createReview = async (listingId, reviewData) => {
-    const res = await axios.post(`${API_BASE}/listings/${listingId}/reviews`, { review: reviewData }, { withCredentials: true });
-    return res.data;
+    try {
+        const res = await axios.post(
+            `${API_BASE}/listings/${listingId}/reviews`,
+            { review: reviewData },
+            { withCredentials: true }
+        );
+        return res.data;
+    } catch (err) {
+        console.error("Create Review Error:", err.response?.data || err);
+        throw err;
+    }
 };
 
 export const deleteReview = async (listingId, reviewId) => {
-    const res = await axios.delete(`${API_BASE}/listings/${listingId}/reviews/${reviewId}`, { withCredentials: true });
-    return res.data;
+    try {
+        const res = await axios.delete(
+            `${API_BASE}/listings/${listingId}/reviews/${reviewId}`,
+            { withCredentials: true }
+        );
+        return res.data;
+    } catch (err) {
+        console.error("Delete Review Error:", err.response?.data || err);
+        throw err;
+    }
 };
 
 // ----------------- Profile -----------------
 export const fetchProfile = async (userId) => {
-    const res = await axios.get(`${API_BASE}/profile/${userId}`, { withCredentials: true });
-    return res.data;
+    try {
+        const res = await axios.get(`${API_BASE}/profile/${userId}`, { withCredentials: true });
+        return res.data;
+    } catch (err) {
+        console.error("Fetch Profile Error:", err.response?.data || err);
+        throw err;
+    }
 };
 
 export const updateProfile = async (userId, profileData) => {
-    const res = await axios.post(`${API_BASE}/profile/${userId}/update`, profileData, { withCredentials: true });
-    return res.data;
+    try {
+        const res = await axios.post(`${API_BASE}/profile/${userId}/update`, profileData, { withCredentials: true });
+        return res.data;
+    } catch (err) {
+        console.error("Update Profile Error:", err.response?.data || err);
+        throw err;
+    }
+};
+
+export const deleteProfile = async (userId) => {
+    try {
+        const res = await axios.delete(`${API_BASE}/profile/${userId}`, { withCredentials: true });
+        return res.data;
+    } catch (err) {
+        console.error("Delete Profile Error:", err.response?.data || err);
+        throw err;
+    }
 };
 
 // ----------------- Users -----------------
 export const signupUser = async (user) => {
-    const res = await axios.post(`${API_BASE}/users/signup`, user, { withCredentials: true });
-    return res.data.success ? res.data.user : null;
+    try {
+        const res = await axios.post(`${API_BASE}/users/signup`, user, { withCredentials: true });
+        return res.data.success ? res.data.user : null;
+    } catch (err) {
+        console.error("Signup User Error:", err.response?.data || err);
+        throw err;
+    }
 };
 
 export const loginUser = async (user) => {
-    const res = await axios.post(`${API_BASE}/users/login`, user, { withCredentials: true });
-    return res.data.success ? res.data.user : null;
+    try {
+        const res = await axios.post(`${API_BASE}/users/login`, user, { withCredentials: true });
+        return res.data.success ? res.data.user : null;
+    } catch (err) {
+        console.error("Login User Error:", err.response?.data || err);
+        throw err;
+    }
 };
 
 export const logoutUser = async () => {
-    const res = await axios.post(`${API_BASE}/users/logout`, {}, { withCredentials: true });
-    return res.data.success || false;
+    try {
+        const res = await axios.post(`${API_BASE}/users/logout`, {}, { withCredentials: true });
+        return res.data.success || false;
+    } catch (err) {
+        console.error("Logout User Error:", err.response?.data || err);
+        throw err;
+    }
 };
 
 export const getCurrentUser = async () => {
@@ -100,19 +155,29 @@ export const getCurrentUser = async () => {
         const res = await axios.get(`${API_BASE}/users/current`, { withCredentials: true });
         return res.data.success ? res.data.user : null;
     } catch (err) {
-        console.error("Error fetching current user:", err);
+        console.error("Get Current User Error:", err.response?.data || err);
         return null;
     }
 };
 
 // ----------------- Search -----------------
 export const searchListings = async (query) => {
-    const res = await axios.get(`${API_BASE}/search?query=${encodeURIComponent(query)}`, { withCredentials: true });
-    return res.data.listings || [];
+    try {
+        const res = await axios.get(`${API_BASE}/search?query=${encodeURIComponent(query)}`, { withCredentials: true });
+        return res.data.listings || [];
+    } catch (err) {
+        console.error("Search Listings Error:", err.response?.data || err);
+        throw err;
+    }
 };
 
 // ----------------- Categories -----------------
 export const fetchListingsByCategory = async (category) => {
-    const res = await axios.get(`${API_BASE}/categories/category/${category}`, { withCredentials: true });
-    return res.data.listings || [];
+    try {
+        const res = await axios.get(`${API_BASE}/categories/category/${category}`, { withCredentials: true });
+        return res.data.listings || [];
+    } catch (err) {
+        console.error("Fetch Listings By Category Error:", err.response?.data || err);
+        throw err;
+    }
 };

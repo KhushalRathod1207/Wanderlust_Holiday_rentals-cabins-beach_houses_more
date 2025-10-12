@@ -76,6 +76,7 @@ store.on("error", function (e) {
 });
 
 // Session configuration for cross-domain login
+// Update session cookie config dynamically
 const sessionOptions = {
     store,
     secret: process.env.SECRET,
@@ -83,8 +84,8 @@ const sessionOptions = {
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        secure: true,       // required for HTTPS
-        sameSite: "none",   // allow frontend on different domain
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 };
