@@ -49,10 +49,26 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
 // CORS
-app.use(cors({
-    origin: "http://localhost:5173",  // React app origin
-    credentials: true                 // allows sending cookies / credentials
-}));
+const allowedOrigins = [
+    "http://localhost:5173", // Local dev
+    process.env.CLIENT_ORIGIN, // Live frontend from .env (Vercel)
+];
+
+app.use(
+    cors({
+        origin: function (origin, callback) {
+            // Allow requests with no origin (like Postman or server-to-server)
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                console.log("❌ Blocked by CORS:", origin);
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        credentials: true,
+    })
+);
+
 
 // Session store
 const store = MongoStore.create({
