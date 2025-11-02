@@ -72,16 +72,10 @@ const allowedOrigins = [
 
 app.use(
     cors({
-        origin: function (origin, callback) {
-            // Allow requests with no origin (Postman, server-to-server)
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                console.log("❌ Blocked by CORS:", origin);
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
+        origin: allowedOrigins,
         credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
 
@@ -105,9 +99,9 @@ const sessionOptions = {
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // HTTPS only in production
+        secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 1 week
+        maxAge: 7 * 24 * 60 * 60 * 1000,
     },
 };
 
