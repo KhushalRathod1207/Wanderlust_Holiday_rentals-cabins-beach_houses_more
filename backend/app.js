@@ -1,8 +1,11 @@
+// Load environment variables (only in development)
 if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
+    require("dotenv").config();
 }
 
-
+// -------------------------
+// Import dependencies
+// -------------------------
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -14,9 +17,13 @@ const passport = require("passport");
 const passport_local_strategy = require("passport-local");
 const methodOverride = require("method-override");
 const cors = require("cors");
+const ejsMate = require("ejs-mate");
+
 const port = process.env.PORT || 3008;
 
+// -------------------------
 // Import routes
+// -------------------------
 const listingsRoute = require("./routes/listings.js");
 const reviewsRoute = require("./routes/reviews.js");
 const profileRoute = require("./routes/Profile.js");
@@ -24,40 +31,49 @@ const userRoute = require("./routes/user.js");
 const searchRoute = require("./routes/search.js");
 const categoryRoutes = require("./routes/categories.js");
 
-// Models
+// -------------------------
+// Models & Utils
+// -------------------------
 const User = require("./model/user.js");
-
-// Utils
 const ExpressError = require("./utils/expressError.js");
 const WrapAsync = require("./utils/WrapAsync.js");
 
-// DB connection
+// -------------------------
+// Database connection
+// -------------------------
 const dbUrl = process.env.ATLASDB_URL;
-mongoose.connect(dbUrl)
-    .then(() => console.log("Connected to Database"))
-    .catch(err => console.log(err));
 
-// EJS setup
-const ejsMate = require("ejs-mate");
+mongoose.connect(dbUrl)
+    .then(() => console.log("✅ Connected to MongoDB Atlas"))
+    .catch((err) => console.error("❌ DB Connection Error:", err));
+
+// -------------------------
+// View engine setup
+// -------------------------
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Static files
+// -------------------------
+// Middleware
+// -------------------------
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(methodOverride("_method"));
 
-// CORS
+// -------------------------
+// CORS setup
+// -------------------------
 const allowedOrigins = [
-    "http://localhost:5173", // Local dev
-    process.env.CLIENT_ORIGIN, // Live frontend from .env (Vercel)
+    "http://localhost:5173", // Local development
+    process.env.CLIENT_ORIGIN, // Production frontend
 ];
 
 app.use(
     cors({
         origin: function (origin, callback) {
-            // Allow requests with no origin (like Postman or server-to-server)
+            // Allow requests with no origin (Postman, server-to-server)
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
@@ -69,19 +85,17 @@ app.use(
     })
 );
 
-
-// Session store
+// -------------------------
+// Session configuration
+// -------------------------
 const store = MongoStore.create({
     mongoUrl: dbUrl,
     crypto: { secret: process.env.SECRET },
-    touchAfter: 24 * 3600
+    touchAfter: 24 * 3600, // 1 day
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-store.on("error", function (e) {
-    console.log("SESSION STORE ERROR", e);
+store.on("error", (e) => {
+    console.log("❌ SESSION STORE ERROR", e);
 });
 
 const sessionOptions = {
@@ -91,31 +105,41 @@ const sessionOptions = {
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // ✅ Only HTTPS in production
+        secure: process.env.NODE_ENV === "production", // HTTPS only in production
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 1 week
     },
 };
 
-
+// 🔒 Required for production cookie security (trust proxy)
+app.set("trust proxy", 1);
 app.use(session(sessionOptions));
 app.use(flash());
 
-
-
-// Passport config
+// -------------------------
+// Passport configuration
+// -------------------------
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new passport_local_strategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Flash & current user middleware
+// -------------------------
+// Flash messages + current user
+// -------------------------
 app.use((req, res, next) => {
     res.locals.successMsg = req.flash("success");
     res.locals.errorMsg = req.flash("error");
     res.locals.currUser = req.user;
     next();
+});
+
+// -------------------------
+// Routes
+// -------------------------
+app.get("/", (req, res) => {
+    res.json({ success: true, message: "🌍 Wanderlust backend is running successfully!" });
 });
 
 app.use("/listings", listingsRoute);
@@ -125,20 +149,18 @@ app.use("/users", userRoute);
 app.use("/search", searchRoute);
 app.use("/categories", categoryRoutes);
 
-
-// // 404
-// app.all("*", (req, res, next) => {
-//     next(new ExpressError(404, "Page Not Found"));
-// });
-
+// -------------------------
 // Error handler
+// -------------------------
 app.use((err, req, res, next) => {
     const { status = 500, message = "Something went wrong" } = err;
-    console.error(err);
+    console.error("❌ ERROR:", err);
     res.status(status).json({ success: false, status, message });
 });
 
+// -------------------------
 // Start server
+// -------------------------
 app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
+    console.log(`🚀 Server is running on port ${port}`);
 });
