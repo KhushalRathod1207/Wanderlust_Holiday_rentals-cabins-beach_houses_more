@@ -129,13 +129,7 @@ const ListingIndex = () => {
             ) : (
                 <div className="text-center my-5">
                     <p className="mb-4">No listings found.</p>
-                    <a
-                        href="/listings/new"
-                        className="btn btn-primary btn-lg"
-                        style={{ width: "100%", maxWidth: "400px" }}
-                    >
-                        Create Your First Listing
-                    </a>
+
                 </div>
             )}
 

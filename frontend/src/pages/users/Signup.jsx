@@ -57,6 +57,14 @@ const Signup = ({ setCurrUser }) => {
 
     return (
         <div className="d-flex justify-content-center align-items-center min-vh-100">
+            {/* ✅ Home Button */}
+            <Link
+                to="/listings"
+                className="btn btn-outline-dark position-absolute"
+                style={{ top: "20px", left: "20px" }}
+            >
+                <i className="fa-solid fa-house me-2"></i> Home
+            </Link>
             <div className="col-md-6 col-10">
                 <div className="card shadow-lg p-4">
                     <h2 className="text-center mb-4">Sign Up on Wanderlust</h2>
