@@ -88,13 +88,15 @@ const sessionOptions = {
     store,
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // ✅ Only HTTPS in production
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-        maxAge: 7 * 24 * 60 * 60 * 1000
-    }
+    },
 };
+
 
 app.use(session(sessionOptions));
 app.use(flash());
